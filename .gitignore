@@ -1,0 +1,8 @@
+*.server-review.json
+RawData.json
+Review.log
+Tenant Reviews/
+Server Review Data/
+.gh-preview.html
+Thumbs.db
+.DS_Store
