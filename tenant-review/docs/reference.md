@@ -125,6 +125,26 @@ Within each group, items are gathered into themes by area. Each theme says why i
 
 The indicative timeline assumes `PlanDaysPerWeek` engineer days a week. Set `DayRate` to add an indicative cost per group; costs are hidden while it is 0. `ActionPlan.csv` has one row per item. The theme wording is in `Module\Private\ActionPlan.ps1`.
 
+### Editing effort
+
+Select **Edit effort** in the HTML report to change any estimate. Type `30m`, `2h` or `1.5d`; a plain number is hours for a finding and days for a licensed feature. Every dependent figure recalculates in the page: the item on every tab, theme and group totals, the summary paragraph, the timeline, costs, the overview and Recommendations totals, and the report's CSV exports. Changes are kept in the browser for that report.
+
+| Button | What it does |
+| --- | --- |
+| Save changes for rebuild | Saves `EffortOverrides.json`. Keep it in the review folder and use **Rebuild from saved data** so the tool's PDFs and CSV files match |
+| Save edited copy | Saves a copy of the HTML report with the new figures built in |
+| Undo all changes | Puts every figure back to the value the tool calculated |
+| Summary PDF | Prints only the executive summary and the action plan |
+
+`EffortOverrides.json` and the `EffortOverrides` setting in `config.json` share one layout:
+
+```json
+{
+  "Findings": { "IAM-05": 1.5 },
+  "Opportunities": { "OPP-01": 0.5 }
+}
+```
+
 ## Azure
 
 Tick **Azure subscriptions and resources** (Microsoft 365 only). At the start of the review the browser asks once to approve read access to Azure Resource Manager. The tool then reads every subscription the account can see through Azure Resource Manager, Azure Resource Graph, Defender for Cloud and Azure Advisor.
@@ -236,6 +256,7 @@ Each run creates `<Reports folder>\<Client>\<yyyy-MM-dd_HHmm>\` containing:
 | `<Client>-M365-Review-<date>-Summary-and-Action-Plan.pdf` | Only the executive summary and the action plan, written for the client |
 | `CSV\` | Findings, affected items, recommendations, the action plan, opportunities, benchmarks and benchmark affected items, and one CSV per inventory |
 | `RawData.json` | Everything collected. Used by **Rebuild from saved data** |
+| `EffortOverrides.json` | Only if you save effort changes from the report. Rebuilds of the review use it, so the HTML, PDFs and CSV files match your figures |
 | `Review.log` | The run log |
 
 Google Workspace files are named `<Client>-Google-Workspace-Review-<date>`. These files contain client data. Store them with the client's documentation.
@@ -263,8 +284,20 @@ Google Workspace files are named `<Client>-Google-Workspace-Review-<date>`. Thes
 | `CreateSummaryPdf` | true | Also creates the summary and action plan PDF |
 | `PdfBrowserPath` | Automatic | Path to `msedge.exe` or `chrome.exe` if the PDF step cannot find a browser |
 | `SharePointAdminUrl` | Automatic | SharePoint admin address, for example `https://contoso-admin.sharepoint.com`. Only needed after a tenant rename |
+| `EffortOverrides` | Empty | Your standard effort estimates by ID: `Findings` in hours, `Opportunities` in days. A review's own `EffortOverrides.json` takes priority |
 
 ## Troubleshooting
+
+At the end of every run, `Review.log` lists each item that could not be read, grouped by cause, with what to do. The report shows the same list under Method and limitations, in **What could not be read, and how to fix it**, with the number of checks and benchmark controls each one leaves Not assessed.
+
+| Cause | Meaning | What to do |
+| --- | --- | --- |
+| Permission | The review account lacks a role for that area | Add the role named in the row, then run the review again |
+| Account licence | The review account needs a licence to use that API, for example Power BI | Assign the licence named, then run again |
+| Not approved | Read access to a service was not approved when the browser asked | Run again and approve it |
+| Consent | The app's permissions are not consented, or a Google permission was not ticked | Grant consent, or sign in again and tick every permission |
+| Service error | A temporary error from the service | Run again |
+| Not licensed, Not set up | The client does not have or use that feature | No action |
 
 | Symptom | Cause and fix |
 | --- | --- |

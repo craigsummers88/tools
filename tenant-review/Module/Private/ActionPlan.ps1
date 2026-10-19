@@ -184,7 +184,7 @@ function Get-TRPlanSentence {
 function New-TRPlanCardsHtml {
     param($Plan)
     $sb = New-Object System.Text.StringBuilder
-    [void]$sb.Append('<div class="ap-phases">')
+    [void]$sb.Append('<div class="ap-phases" data-plan="cards">')
     foreach ($p in @($Plan.Phases) + @($Plan.Licences)) {
         if ($p.Key -eq 'Licences' -and -not $p.Items.Count) { continue }
         $n = @($p.Items).Count
@@ -203,13 +203,13 @@ function New-TRPlanSummaryHtml {
     $sb = New-Object System.Text.StringBuilder
     [void]$sb.Append('<h3>What needs doing</h3>')
     [void]$sb.Append((New-TRPlanCardsHtml $Plan))
-    [void]$sb.Append(('<p class="lead">{0} <a href="#actionplan" data-tab-link="actionplan">See the action plan</a>.</p>' -f (ConvertTo-TRHtml (Get-TRPlanSentence $Plan))))
+    [void]$sb.Append(('<p class="lead"><span data-plan="sentence">{0}</span> <a href="#actionplan" data-tab-link="actionplan">See the action plan</a>.</p>' -f (ConvertTo-TRHtml (Get-TRPlanSentence $Plan))))
     $top = @(Get-TRPlanTop $Plan 10)
     if ($top.Count) {
         [void]$sb.Append('<h3>Top priorities</h3><div class="table-wrap static"><table><thead><tr><th>When</th><th>What good looks like</th><th>What we found</th><th class="num">Effort</th></tr></thead><tbody>')
         foreach ($f in $top) {
             $k = Get-TRPlanPhaseKey $f
-            [void]$sb.Append(('<tr><td><span class="chip ph-{0}">{1}</span></td><td><a href="#" data-goto="f-{2}">{3}</a></td><td>{4}</td><td class="num nw">{5}</td></tr>' -f $k, $(if ($k -eq 'Must') { 'Must do' } else { 'Should do' }), (ConvertTo-TRHtml $f.Id), (ConvertTo-TRHtml $f.Title), (ConvertTo-TRHtml (Get-TRShortText $f.Current)), (Format-TREffort ([double]$f.EffortHours) $Plan.HoursPerDay)))
+            [void]$sb.Append(('<tr><td><span class="chip ph-{0}">{1}</span></td><td><a href="#" data-goto="f-{2}">{3}</a></td><td>{4}</td><td class="num nw"><span class="eff" data-ef="{2}" data-fmt="E">{5}</span></td></tr>' -f $k, $(if ($k -eq 'Must') { 'Must do' } else { 'Should do' }), (ConvertTo-TRHtml $f.Id), (ConvertTo-TRHtml $f.Title), (ConvertTo-TRHtml (Get-TRShortText $f.Current)), (Format-TREffort ([double]$f.EffortHours) $Plan.HoursPerDay)))
         }
         [void]$sb.Append('</tbody></table></div>')
     }
@@ -251,11 +251,11 @@ function New-TRActionPlanHtml {
     $capText = '{0} engineer {1} a week' -f (Format-TRNumber $Plan.Capacity), $(if ($Plan.Capacity -eq 1) { 'day' } else { 'days' })
     [void]$sb.Append(('<p class="note">{0}</p>' -f (ConvertTo-TRHtml ('This plan turns the findings into work, grouped by what it protects and ordered by urgency. Must do items are serious gaps to fix first, should do items are important improvements, and could do items are good practice. Effort is the estimated engineer time to make each change; it is for planning only and does not include time for agreeing changes, telling staff or testing with {0}.' -f $Client))))
     [void]$sb.Append((New-TRPlanCardsHtml $Plan))
-    [void]$sb.Append(('<p class="lead">{0}</p>' -f (ConvertTo-TRHtml (Get-TRPlanSentence $Plan))))
+    [void]$sb.Append(('<p class="lead"><span data-plan="sentence">{0}</span></p>' -f (ConvertTo-TRHtml (Get-TRPlanSentence $Plan))))
     $rows = @(@($Plan.Phases) + @($Plan.Licences) | Where-Object { $_.Weeks -gt 0 })
     if ($rows.Count -and $Plan.TotalWeeks -gt 0) {
         $tw = [double]$Plan.TotalWeeks
-        [void]$sb.Append('<h3>Indicative timeline</h3><div class="tl">')
+        [void]$sb.Append('<h3>Indicative timeline</h3><div class="tl" data-plan="timeline">')
         $step = if ($tw -le 12) { 1 } elseif ($tw -le 26) { 2 } elseif ($tw -le 52) { 4 } else { 8 }
         [void]$sb.Append('<div class="tl-row tl-scale"><div></div><div class="tl-track">')
         for ($w = 1; $w -le $tw; $w += $step) { [void]$sb.Append(('<span style="left:{0}%">{1}</span>' -f (Format-TRNumber (100 * ($w - 1) / $tw) '0.##'), $w)) }
@@ -276,13 +276,13 @@ function New-TRActionPlanHtml {
             continue
         }
         foreach ($g in $p.Themes) {
-            [void]$sb.Append(('<div class="ap-theme"><div class="ap-head"><h4>{0}</h4><span class="ap-eff">About {1}</span></div>' -f (ConvertTo-TRHtml $g.Theme.Name), (ConvertTo-TRHtml (Format-TREffort $g.Hours $Plan.HoursPerDay))))
+            [void]$sb.Append(('<div class="ap-theme"><div class="ap-head"><h4>{0}</h4><span class="ap-eff">About <span class="effsum" data-sum="{2}" data-fmt="E">{1}</span></span></div>' -f (ConvertTo-TRHtml $g.Theme.Name), (ConvertTo-TRHtml (Format-TREffort $g.Hours $Plan.HoursPerDay)), (ConvertTo-TRHtml ('theme:{0}:{1}' -f $p.Key, $g.Theme.Key))))
             if ($g.Theme.Why) { [void]$sb.Append(('<p class="ap-why"><b>Why it matters.</b> {0}</p>' -f (ConvertTo-TRHtml $g.Theme.Why))) }
             $compact = $p.Key -eq 'Could'
             [void]$sb.Append($(if ($compact) { '<ul class="ap-items compact">' } else { '<ul class="ap-items">' }))
             foreach ($f in $g.Items) {
                 $found = if ($compact) { '' } else { '<span class="found">We found: {0}</span>' -f (ConvertTo-TRHtml (Get-TRShortText $f.Current)) }
-                [void]$sb.Append(('<li><a class="goal" href="#" data-goto="f-{0}">{1}</a><span class="h">{2}</span>{3}</li>' -f (ConvertTo-TRHtml $f.Id), (ConvertTo-TRHtml $f.Title), (ConvertTo-TRHtml (Format-TREffort ([double]$f.EffortHours) $Plan.HoursPerDay)), $found))
+                [void]$sb.Append(('<li><a class="goal" href="#" data-goto="f-{0}">{1}</a><span class="h"><span class="eff" data-ef="{0}" data-fmt="E">{2}</span></span>{3}</li>' -f (ConvertTo-TRHtml $f.Id), (ConvertTo-TRHtml $f.Title), (ConvertTo-TRHtml (Format-TREffort ([double]$f.EffortHours) $Plan.HoursPerDay)), $found))
             }
             [void]$sb.Append('</ul>')
             if ($g.Theme.Staff -or $g.Theme.Input) { [void]$sb.Append(('<div class="ap-foot"><div><b>What your staff will notice</b>{0}</div><div><b>What we need from you</b>{1}</div></div>' -f (ConvertTo-TRHtml $g.Theme.Staff), (ConvertTo-TRHtml $g.Theme.Input))) }
@@ -294,7 +294,7 @@ function New-TRActionPlanHtml {
         [void]$sb.Append(('<h3 class="ap-ph"><span class="chip ph-Licences">4</span>{0}</h3><p class="ap-intro">{1}</p>' -f (ConvertTo-TRHtml $lic.Name), (ConvertTo-TRHtml $lic.Text)))
         [void]$sb.Append('<div class="table-wrap static"><table><thead><tr><th>Feature</th><th>Now</th><th>What it gives you</th><th class="num">Effort</th></tr></thead><tbody>')
         foreach ($o in $lic.Items) {
-            [void]$sb.Append(('<tr><td><a href="#" data-goto="o-{0}">{1}</a></td><td><span class="chip o-{2}">{3}</span></td><td>{4}</td><td class="num">{5}</td></tr>' -f (ConvertTo-TRHtml $o.Id), (ConvertTo-TRHtml $o.Feature), $o.Status, (ConvertTo-TRHtml $o.StatusLabel), (ConvertTo-TRHtml $o.Benefit), (Format-TRDays ([double]$o.EffortDays))))
+            [void]$sb.Append(('<tr><td><a href="#" data-goto="o-{0}">{1}</a></td><td><span class="chip o-{2}">{3}</span></td><td>{4}</td><td class="num nw"><span class="eff" data-eo="{0}" data-fmt="D">{5}</span></td></tr>' -f (ConvertTo-TRHtml $o.Id), (ConvertTo-TRHtml $o.Feature), $o.Status, (ConvertTo-TRHtml $o.StatusLabel), (ConvertTo-TRHtml $o.Benefit), (Format-TRDays ([double]$o.EffortDays))))
         }
         [void]$sb.Append('</tbody></table></div>')
     }
@@ -325,7 +325,7 @@ function Get-TRActionPlanRows {
     foreach ($o in $Plan.Licences.Items) {
         [pscustomobject][ordered]@{
             'Phase' = ('4. ' + $Plan.Licences.Name); 'When' = $Plan.Licences.When; 'Theme' = $o.Category; 'What good looks like' = $o.Feature; 'What we found' = $o.Evidence
-            'Effort hours' = ([double]$o.EffortDays * $Plan.HoursPerDay); 'Why it matters' = $o.Benefit; 'What staff will notice' = ''; 'What we need from you' = ''; 'ID' = $o.Id; 'Severity' = ''
+            'Effort hours' = [Math]::Round([double]$o.EffortDays * $Plan.HoursPerDay, 2); 'Why it matters' = $o.Benefit; 'What staff will notice' = ''; 'What we need from you' = ''; 'ID' = $o.Id; 'Severity' = ''
         }
     }
     foreach ($f in $Plan.Confirm) {
@@ -334,4 +334,32 @@ function Get-TRActionPlanRows {
             'Effort hours' = ''; 'Why it matters' = ''; 'What staff will notice' = ''; 'What we need from you' = ''; 'ID' = $f.Id; 'Severity' = $f.Severity
         }
     }
+}
+
+function New-TRPlanModelJson {
+    param($Plan)
+    $sb = New-Object System.Text.StringBuilder
+    [void]$sb.Append('{"hpd":').Append((ConvertTo-TRJsonString ([double]$Plan.HoursPerDay)))
+    [void]$sb.Append(',"cap":').Append((ConvertTo-TRJsonString ([double]$Plan.Capacity)))
+    [void]$sb.Append(',"rate":').Append((ConvertTo-TRJsonString ([double]$Plan.Rate)))
+    [void]$sb.Append(',"sym":').Append((ConvertTo-TRJsonString ([string]$Plan.Symbol)))
+    [void]$sb.Append(',"phases":[')
+    $i = 0
+    foreach ($p in $Plan.Phases) {
+        if ($i) { [void]$sb.Append(',') }
+        $i++
+        [void]$sb.Append('{"key":').Append((ConvertTo-TRJsonString $p.Key)).Append(',"name":').Append((ConvertTo-TRJsonString $p.Name)).Append(',"when":').Append((ConvertTo-TRJsonString $p.When))
+        [void]$sb.Append(',"items":').Append((ConvertTo-TRJsonArray @($p.Items | ForEach-Object { [string]$_.Id })))
+        [void]$sb.Append(',"themes":[')
+        $j = 0
+        foreach ($g in $p.Themes) {
+            if ($j) { [void]$sb.Append(',') }
+            $j++
+            [void]$sb.Append('{"key":').Append((ConvertTo-TRJsonString ([string]$g.Theme.Key))).Append(',"items":').Append((ConvertTo-TRJsonArray @($g.Items | ForEach-Object { [string]$_.Id }))).Append('}')
+        }
+        [void]$sb.Append(']}')
+    }
+    [void]$sb.Append('],"lic":{"name":').Append((ConvertTo-TRJsonString $Plan.Licences.Name)).Append(',"when":').Append((ConvertTo-TRJsonString $Plan.Licences.When))
+    [void]$sb.Append(',"items":').Append((ConvertTo-TRJsonArray @($Plan.Licences.Items | ForEach-Object { [string]$_.Id }))).Append('}}')
+    $sb.ToString()
 }

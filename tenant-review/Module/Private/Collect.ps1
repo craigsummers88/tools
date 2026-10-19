@@ -622,7 +622,7 @@ function Invoke-TRCollectIntune {
     $ok = Invoke-TRStep 'Intune' 'ManagedDevices' -List { Invoke-TRGraph -Path '/deviceManagement/managedDevices?$select=id,deviceName,operatingSystem,osVersion,complianceState,lastSyncDateTime,isEncrypted,managedDeviceOwnerType,enrolledDateTime,userPrincipalName,model,manufacturer,jailBroken,deviceEnrollmentType,serialNumber,azureADDeviceId' -All }
     $keys = @('DeviceManagement', 'CompliancePolicies', 'DeviceConfigurations', 'ConfigurationPolicies', 'Intents', 'EnrollmentConfigurations', 'AutopilotDevices', 'IosAppProtection', 'AndroidAppProtection') + $script:TRIntuneDeepKeys
     if (-not $ok) {
-        Skip-TRStep 'Intune' $keys 'Intune data could not be read. The tenant may not be licensed for Intune, or the account lacks an Intune read role.'
+        Skip-TRStep 'Intune' $keys 'Intune data could not be read. See ManagedDevices for the error.'
         $script:TRRaw['Meta']['IntuneAvailable'] = $false
         return
     }
@@ -1255,7 +1255,7 @@ function Invoke-TenantCollection {
         [string[]]$Areas = $script:TRDefaultAreas,
         [string]$ClientName,
         [int]$MaxMailboxes = 3000,
-        [string]$ToolVersion = '1.4.3'
+        [string]$ToolVersion = '1.5.0'
     )
     $ctx = Get-TRContext
     if (-not $ctx -or -not $ctx.TenantId) { throw 'Sign in to the client tenant first.' }

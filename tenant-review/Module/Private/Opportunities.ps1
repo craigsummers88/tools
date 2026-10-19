@@ -610,7 +610,7 @@ function Invoke-TROpportunities {
                 Evidence      = $res.Evidence
                 Opportunity   = $def.Opportunity
                 Benefit       = $def.Benefit
-                EffortDays    = $(if ($res.Status -in @('NotUsed', 'Partial')) { $def.EffortDays } else { 0 })
+                EffortDays    = $(if ($res.Status -in @('NotUsed', 'Partial')) { Get-TREffortValue -Kind Opportunities -Id $def.Id -Default $def.EffortDays } else { 0 })
                 Reference     = $def.Reference
             })
     }

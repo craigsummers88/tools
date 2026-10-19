@@ -1985,7 +1985,7 @@ function Invoke-TRChecks {
                 Priority       = $priority
                 Current        = $res.Current
                 Recommendation = $def.Recommendation
-                EffortHours    = $(if ($res.Status -in @('Fail', 'Warning')) { $def.Effort } else { 0 })
+                EffortHours    = $(if ($res.Status -in @('Fail', 'Warning')) { Get-TREffortValue -Kind Findings -Id $def.Id -Default $def.Effort } else { 0 })
                 Reference      = $def.Reference
                 AffectedCount  = @($res.Affected).Count
                 Affected       = @($res.Affected)

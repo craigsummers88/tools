@@ -1,4 +1,4 @@
-$script:TRToolVersion = '1.4.3'
+$script:TRToolVersion = '1.5.0'
 
 $script:TRRequiredGraphScopes = @(
     'User.Read', 'Directory.Read.All', 'Policy.Read.All', 'AuditLog.Read.All', 'Reports.Read.All', 'ReportSettings.Read.All',
@@ -139,6 +139,7 @@ function Invoke-TenantAnalysis {
         if ($Areas -and $Areas -notcontains 'Servers') { $Areas = @($Areas) + 'Servers' }
     }
     Initialize-TRAnalysis -Raw $Raw
+    Import-TREffortOverrides -Folder $OutputFolder
     if (-not $Areas) { $Areas = @(Get-TRMeta 'Areas') }
     $checkAreas = @(@($Areas) + @('Identity', 'Licensing') | Select-Object -Unique)
     Set-TRProgress 90 'Evaluating checks'
@@ -232,6 +233,8 @@ function Invoke-TenantReview {
         if ($null -ne $result.AzureScore) { $msg += (' Azure: {0}%.' -f $result.AzureScore) }
         if ($null -ne $result.ServerScore) { $msg += (' Servers: {0}%.' -f $result.ServerScore) }
         Write-TRLog $msg 'Success'
+        try { Write-TRCollectionAdvice -Diagnostics @(Get-TRItems 'Diagnostics') -Findings $result.Findings -Benchmarks $result.Benchmarks }
+        catch { Write-TRLog ('Could not summarise the collection problems: ' + $_.Exception.Message) 'Warn' }
         $result
     }
     finally {

@@ -17,11 +17,12 @@ All screenshots use fictional organisations (Fabrikam Lettings Ltd, Northwind De
 9. [Include Azure](#9-include-azure)
 10. [Include servers](#10-include-servers)
 11. [Read the report](#11-read-the-report)
-12. [Share the results with the client](#12-share-the-results-with-the-client)
-13. [Rebuild a report without signing in again](#13-rebuild-a-report-without-signing-in-again)
-14. [Tidy up after the review](#14-tidy-up-after-the-review)
-15. [Troubleshooting](#15-troubleshooting)
-16. [Looking after client data](#16-looking-after-client-data)
+12. [Adjust the effort estimates](#12-adjust-the-effort-estimates)
+13. [Share the results with the client](#13-share-the-results-with-the-client)
+14. [Rebuild a report without signing in again](#14-rebuild-a-report-without-signing-in-again)
+15. [Tidy up after the review](#15-tidy-up-after-the-review)
+16. [Troubleshooting](#16-troubleshooting)
+17. [Looking after client data](#17-looking-after-client-data)
 
 ## 1. Before you start
 
@@ -327,6 +328,8 @@ Items are gathered into themes the client recognises, such as "Protect sign-ins 
 
 *Figure 14. The action plan, with the groups, the indicative timeline and the first themes.*
 
+If an estimate does not match how long the work takes your team, change it before you share the report. See [Adjust the effort estimates](#12-adjust-the-effort-estimates).
+
 ### 11.3 Findings
 
 Every check with its status, severity, evidence, the affected items and how to fix it. Filter by area, status or severity. Each finding lists the benchmark controls it relates to.
@@ -379,13 +382,69 @@ Searchable tables of everything collected: users, admin roles, Conditional Acces
 
 ### 11.8 Method and limitations
 
-What was reviewed, when, by whom, which areas were included, and what the tool cannot see. Point the client to this tab if they ask how the review was done.
+What was reviewed, when, by whom, which areas were included, and what the tool cannot see. It also lists anything that could not be read, why, and what to do about it (see [Troubleshooting](#16-troubleshooting)). Point the client to this tab if they ask how the review was done.
 
 ![Method and limitations](images/report-method.png)
 
 *Figure 20. Method and limitations.*
 
-## 12. Share the results with the client
+## 12. Adjust the effort estimates
+
+Every effort figure is an estimate. Before you share the report, change any that do not match how long the work takes your team.
+
+1. In the HTML report, select **Edit effort** at the top. Every effort figure is highlighted.
+2. Select a figure, type the new value and press Enter. Use `30m`, `2h` or `1.5d`. A plain number means hours for a finding and days for a licensed feature, and `0` means minimal. Press Esc to cancel.
+3. Select **Finish editing** when you are done.
+
+![Editing effort in the report](images/report-edit-effort.png)
+
+*Figure 21. Edit mode. The figure just changed is green, and the one being typed in shows its current value.*
+
+Everything that depends on the figure updates at once:
+
+- the same item on the Summary, Action plan, Findings and Recommendations tabs, or on the Opportunities tab for a licensed feature;
+- the theme total, the group cards and the summary paragraph;
+- the indicative timeline and, if you set a day rate, the indicative costs;
+- the overall effort in the overview and the Recommendations total;
+- the CSV exports from the report's own Export CSV buttons.
+
+Your changes stay in the browser for that report, so they are still there if you close and reopen it. **Undo all changes** puts every figure back.
+
+### 12.1 Print or save the edited report
+
+Use the buttons at the top of the report:
+
+| Button | Gives you |
+| --- | --- |
+| Summary PDF | Only the executive summary and the action plan, for the client |
+| Save as PDF | The full report |
+
+Choose **Save as PDF** as the printer in the print dialogue.
+
+### 12.2 Keep the changes for the PDFs and CSV files the tool created
+
+The PDFs and CSV files in the output folder were created before your edits. To update them:
+
+1. Select **Save changes for rebuild** while editing. This saves `EffortOverrides.json`.
+2. Make sure the file is in the review folder, next to `RawData.json`.
+3. In the app, select **Rebuild from saved data** and choose that `RawData.json`.
+
+Every rebuild of that review uses the file, so the HTML report, both PDFs and every CSV file match. **Save edited copy** saves a copy of the HTML report with your figures built in, which opens the same way on any computer.
+
+### 12.3 Set your own standard estimates
+
+If you change the same estimates for every client, set them once in `config.json`. Findings are in hours and licensed features in days. The IDs are shown on each finding and opportunity, and `EffortOverrides.json` uses the same layout, so you can copy entries across:
+
+```json
+"EffortOverrides": {
+  "Findings": { "IAM-05": 1.5, "IAM-06": 0.5 },
+  "Opportunities": { "OPP-01": 0.5 }
+}
+```
+
+The log says how many standard estimates were applied. A review's own `EffortOverrides.json` takes priority over `config.json`.
+
+## 13. Share the results with the client
 
 Each review writes two PDFs next to the HTML report:
 
@@ -396,7 +455,7 @@ Each review writes two PDFs next to the HTML report:
 
 ![Summary and action plan PDF](images/pdf-pages.png)
 
-*Figure 21. Pages from the summary and action plan PDF.*
+*Figure 22. Pages from the summary and action plan PDF.*
 
 A good review meeting runs in this order:
 
@@ -408,17 +467,18 @@ A good review meeting runs in this order:
 
 `ActionPlan.csv` has one row per item for quoting or importing into your PSA.
 
-## 13. Rebuild a report without signing in again
+## 14. Rebuild a report without signing in again
 
-Every review saves `RawData.json`, which holds everything collected. **Rebuild from saved data** regenerates the report, PDFs and CSV files from it. Use it to:
+Every review saves `RawData.json`, which holds everything collected. **Rebuild from saved data** regenerates the report, PDFs and CSV files from it, and applies any `EffortOverrides.json` in the same folder. Use it to:
 
+- apply effort changes you saved from the report (see [Adjust the effort estimates](#12-adjust-the-effort-estimates));
 - change settings such as `DayRate` or `CompanyName` and regenerate the report;
 - add or refresh server data after the review;
 - pick up check changes in a newer version of the tool.
 
 Rebuilding does not read the tenant again, so it cannot pick up changes the client has made since the review, or Azure subscriptions that were not visible at the time.
 
-## 14. Tidy up after the review
+## 15. Tidy up after the review
 
 ### Microsoft 365
 
@@ -434,7 +494,13 @@ Tick **Revoke the review app's access when the review finishes**, or select **Re
 
 Delete the `.server-review.json` files from the servers and any shares once you have copied them to the client's folder.
 
-## 15. Troubleshooting
+## 16. Troubleshooting
+
+When something cannot be read, the end of `Review.log` lists each problem with what to do, and the report repeats it under **Method and limitations**, in **What could not be read, and how to fix it**. Rows marked **Action needed** are fixed on the review account: add the role or licence named, or approve access when asked, then run the review again. The **Effect** column shows how many checks and benchmark controls each fix fills in. Rows marked **No action** reflect what the client has licensed or set up.
+
+![What could not be read, and how to fix it](images/report-what-to-fix.png)
+
+*Figure 23. Two problems to fix on the review account (a Purview role and a free Power BI licence), and five that need no action.*
 
 | Symptom | Cause and fix |
 | --- | --- |
@@ -451,7 +517,7 @@ Delete the `.server-review.json` files from the servers and any shares once you 
 
 The [reference](reference.md#troubleshooting) has the full list.
 
-## 16. Looking after client data
+## 17. Looking after client data
 
 The tool is read-only, but its outputs describe the client's environment in detail.
 

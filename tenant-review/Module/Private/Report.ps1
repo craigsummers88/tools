@@ -402,8 +402,15 @@ h3.ap-ph{display:flex;align-items:center;gap:10px;border-bottom:2px solid var(--
 .tl-note{color:var(--muted);font-size:12px;margin:8px 0 0}
 table.matrix th,table.matrix td{font-size:12px;padding:6px 8px}table.matrix td.num,table.matrix th.num{text-align:center}
 @media (max-width:820px){.tl-row{grid-template-columns:1fr}.tl-scale{display:none}.ap-foot{grid-template-columns:1fr}}
+.adv-items{display:block;font-family:Consolas,Menlo,monospace;font-size:11px;color:var(--muted);margin-top:2px;overflow-wrap:anywhere}
+.chip.adv-act{background:var(--amber-bg);color:var(--amber)}.chip.adv-ok{background:var(--grey-bg);color:var(--grey)}
+.edit-bar{position:sticky;top:48px;z-index:6;background:#FFF8E6;border:1px solid #EBCB8B;border-radius:8px;padding:10px 14px;margin:0 0 16px;display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;box-shadow:0 4px 14px rgba(15,71,97,.10)}
+.edit-bar[hidden]{display:none}.edit-bar .msg{flex:1 1 360px;font-size:13px}.edit-bar .btn{font-size:13px;padding:6px 12px}.edit-bar .btn:disabled{opacity:.45;cursor:default}
+.edit-msg{display:block;color:var(--green);font-weight:bold}.edit-msg.bad{color:var(--red)}.edit-msg:empty{display:none}
+@media screen{body.editing .eff{cursor:pointer;background:#FFF1CC;border-bottom:1px dashed #A65F00;border-radius:3px;padding:0 3px}body.editing .eff:hover{background:#FFE29A}body.editing .eff.edited{background:#DDF1DE;border-bottom-color:var(--green)}body.editing .eff:empty:before{content:'add';color:var(--muted);font-style:italic}}
+.eff-input{font:inherit;font-size:13px;width:90px;padding:1px 5px;border:1px solid var(--navy);border-radius:4px;text-align:right}
 @page{size:A4;margin:12mm 10mm}
-@media print{html,body{-webkit-print-color-adjust:exact;print-color-adjust:exact}body{background:#fff;font-size:11px}.tabs,.filters,.inv-bar,.pager,.btn,#tab-inventory{display:none!important}.masthead{padding:8px 0}.cover{padding:16px 18px;border-radius:6px}.brand-logo{height:52px}h2{page-break-after:avoid}h3{page-break-after:avoid}.ocat-block.print-empty,.bsec-block.print-empty,.ctl.st-Pass,.ctl.st-NotApplicable,.b-filters{display:none!important}.b-cards{grid-template-columns:1fr 1fr}.ctl{page-break-inside:avoid;padding:8px 10px}.summary-grid{grid-template-columns:230px 1fr}.score svg{width:140px;height:140px}.tiles,.opp-sum{grid-template-columns:repeat(4,1fr);gap:8px}.tile{padding:8px 10px}.tile .v{font-size:20px}.f-grid{grid-template-columns:120px 1fr;gap:2px 12px}.f-grid dt{padding-top:1px}.finding,.opp{padding:10px 12px;margin-bottom:8px}main{padding:16px 0}summary:after{content:' (listed in the HTML report and FindingDetails.csv)';font-weight:normal;color:var(--muted)}.ctl summary:after{content:' (listed in the HTML report and BenchmarkDetails.csv)'}.tab{display:block!important;page-break-before:always}#tab-summary{page-break-before:avoid}
+@media print{html,body{-webkit-print-color-adjust:exact;print-color-adjust:exact}body{background:#fff;font-size:11px}.tabs,.filters,.inv-bar,.pager,.btn,.edit-bar,#tab-inventory{display:none!important}.masthead{padding:8px 0}.cover{padding:16px 18px;border-radius:6px}.brand-logo{height:52px}h2{page-break-after:avoid}h3{page-break-after:avoid}.ocat-block.print-empty,.bsec-block.print-empty,.ctl.st-Pass,.ctl.st-NotApplicable,.b-filters{display:none!important}.b-cards{grid-template-columns:1fr 1fr}.ctl{page-break-inside:avoid;padding:8px 10px}.summary-grid{grid-template-columns:230px 1fr}.score svg{width:140px;height:140px}.tiles,.opp-sum{grid-template-columns:repeat(4,1fr);gap:8px}.tile{padding:8px 10px}.tile .v{font-size:20px}.f-grid{grid-template-columns:120px 1fr;gap:2px 12px}.f-grid dt{padding-top:1px}.finding,.opp{padding:10px 12px;margin-bottom:8px}main{padding:16px 0}summary:after{content:' (listed in the HTML report and FindingDetails.csv)';font-weight:normal;color:var(--muted)}.ctl summary:after{content:' (listed in the HTML report and BenchmarkDetails.csv)'}.tab{display:block!important;page-break-before:always}#tab-summary{page-break-before:avoid}
 body.pack .tab:not(#tab-summary):not(#tab-actionplan){display:none!important}body.pack .cover .sub:after{content:': summary and action plan'}.ap-card,.tl,.ap-items li,.ap-why,.ap-foot{page-break-inside:avoid}.ap-foot{font-size:11px}.ap-head,h3.ap-ph,.ap-intro{page-break-after:avoid}.ap-theme{padding:10px 12px;margin-bottom:8px}.ap-items li{padding:4px 0}.ap-phases{grid-template-columns:repeat(4,1fr);gap:8px}.ap-card{padding:8px 10px}.ap-card .v{font-size:22px}.tl-row{grid-template-columns:150px 1fr 95px;margin:5px 0}.tl-scale{display:grid}.ap-foot{grid-template-columns:1fr 1fr}.ap-items .h,.ap-items .found{font-size:11px}.finding,.opp{page-break-inside:avoid;display:block!important}.opp.st-NotLicensed,.opp.st-NotApplicable{display:none!important}.cat-block,.ocat-block,.bsec-block{display:block!important}.table-wrap{max-height:none;overflow:visible}thead th{position:static}details>*{display:block}main{max-width:none}}
 '@
 }
@@ -474,6 +481,7 @@ $$('button',ipager).forEach(function(b){b.addEventListener('click',function(){pa
 function open(name){cur=null;for(var i=0;i<data.inventories.length;i++){if(data.inventories[i].name===name)cur=data.inventories[i]}if(!cur)return;sortCol=-1;sortDir=1;page=0;iq.value='';idesc.textContent=cur.description;filterRows();render()}
 if(ix){ix.addEventListener('change',function(){open(ix.value)});iq.addEventListener('input',function(){page=0;filterRows();render()});
 ie.addEventListener('click',function(){if(cur)download(data.meta.filePrefix+'-'+cur.name+'.csv',cur.columns,curRows)});if(data.inventories.length)open(ix.value)}
+window.__trData=data;
 })();
 '@
 }
@@ -652,7 +660,7 @@ function New-TRReportHtml {
     [void]$sb.Append('</style></head><body>')
     $logo = Get-TRLogoDataUri
     $brand = if ($logo) { '<img class="brand-logo" src="{0}" alt="{1}">' -f $logo, (ConvertTo-TRHtml $company) } else { '<span class="logo">{0}</span><span>{1}</span>' -f (ConvertTo-TRHtml $short), (ConvertTo-TRHtml $company) }
-    [void]$sb.Append(('<header class="masthead"><div class="brand">{0}</div><div class="doc"><span>{1} | Confidential</span><button class="btn secondary" id="btn-pdf" type="button">Save as PDF</button></div></header>' -f $brand, $(if ($gws) { 'Google Workspace Review' } else { 'Microsoft 365 Tenant Review' })))
+    [void]$sb.Append(('<header class="masthead"><div class="brand">{0}</div><div class="doc"><span>{1} | Confidential</span><button class="btn secondary" id="btn-edit" type="button" title="Change the effort estimates before you print or send the report">Edit effort</button><button class="btn secondary" id="btn-pack" type="button" title="Print only the executive summary and the action plan">Summary PDF</button><button class="btn secondary" id="btn-pdf" type="button">Save as PDF</button></div></header>' -f $brand, $(if ($gws) { 'Google Workspace Review' } else { 'Microsoft 365 Tenant Review' })))
     [void]$sb.Append(('<section class="cover"><h1>{0}</h1><p class="sub">{1}</p><dl class="meta">' -f (ConvertTo-TRHtml $client), $(if ($gws) { 'Google Workspace review' } else { 'Microsoft 365 tenant review' })))
     $metaRows = [ordered]@{
         $(if ($gws) { 'Organisation' } else { 'Tenant' }) = $(if ($meta.TenantName) { $meta.TenantName } else { $meta.InitialDomain })
@@ -668,7 +676,7 @@ function New-TRReportHtml {
     if ($bench.Count) { $oppTab += '<button data-tab="benchmarks">Benchmarks</button>' }
     if ($showAzure) { $oppTab += '<button data-tab="azure">Azure</button>' }
     if ($showServers) { $oppTab += '<button data-tab="servers">Servers</button>' }
-    [void]$sb.Append('<nav class="tabs" aria-label="Report sections"><button class="active" data-tab="summary">Summary</button><button data-tab="actionplan">Action plan</button><button data-tab="findings">Findings</button><button data-tab="recommendations">Recommendations</button>' + $oppTab + '<button data-tab="inventory">Inventory</button><button data-tab="method">Method and limitations</button></nav><main>')
+    [void]$sb.Append('<nav class="tabs" aria-label="Report sections"><button class="active" data-tab="summary">Summary</button><button data-tab="actionplan">Action plan</button><button data-tab="findings">Findings</button><button data-tab="recommendations">Recommendations</button>' + $oppTab + '<button data-tab="inventory">Inventory</button><button data-tab="method">Method and limitations</button></nav><main>' + (Get-TREditBarHtml))
 
     [void]$sb.Append('<section id="tab-summary" class="tab active"><h2>1. Executive summary</h2><div class="summary-grid"><div class="card score">')
     [void]$sb.Append((Get-TRSvgRing -Score $score -Colour $ringColour -Text $(if ($scored) { '' } else { 'n/a' })))
@@ -688,9 +696,9 @@ function New-TRReportHtml {
     if (-not $scored) { $lead = '{0}''s {1} was reviewed on {2}, but none of the {3} checks could be assessed because the data could not be read. The Method and limitations section and the Collection diagnostics inventory show what failed and why.' -f $client, $(if ($gws) { 'Google Workspace' } else { 'Microsoft 365 tenant' }), $date, $core.Count }
     if ($highFails.Count -eq 1) { $lead += ' One high-severity issue should be addressed first.' }
     elseif ($highFails.Count) { $lead += (' {0} high-severity issues should be addressed first.' -f $highFails.Count) }
-    if ($effort -gt 0) { $lead += (' Estimated remediation effort for all failed and warning items is about {0:N1} hours ({1:N1} days).' -f $effort, $effortDays) }
+    if ($effort -gt 0) { $lead += (' Estimated remediation effort for all failed and warning items is about [[effH]] hours ([[effD]] days).') }
     if ($oppNotUsed.Count -or $oppPartial.Count) {
-        $lead += ('|| The {3} already has licences for features that are not being used. Not used: {0}. Partly used: {1}. Setting these up is estimated at {2:N1} days (see Opportunities).' -f $oppNotUsed.Count, $oppPartial.Count, $oppEffort, $(if ($gws) { 'organisation' } else { 'tenant' }))
+        $lead += ('|| The {2} already has licences for features that are not being used. Not used: {0}. Partly used: {1}. Setting these up is estimated at [[oppD]] days (see Opportunities).' -f $oppNotUsed.Count, $oppPartial.Count, $(if ($gws) { 'organisation' } else { 'tenant' }))
     }
     if ($benchSum.Count) {
         $parts = @($benchSum | ForEach-Object { '{0} {1}% ({2} of {3} assessed controls, {4} to check manually)' -f $_.Short, $_.Score, $_.Pass, ($_.Pass + $_.Fail), $_.Manual })
@@ -705,7 +713,17 @@ function New-TRReportHtml {
         $lead += ('|| Servers were reviewed separately ({0} from collected server data): the server score is {1}%, with {2} failed and {3} needing attention (see Servers).' -f (Format-TRN $srvCount 'system'), $serverScore, @($serverF | Where-Object { $_.Status -eq 'Fail' }).Count, @($serverF | Where-Object { $_.Status -eq 'Warning' }).Count)
     }
     [void]$sb.Append('<h3>Overview</h3>')
-    foreach ($para in ($lead -split '\|\| ')) { if ($para.Trim()) { [void]$sb.Append(('<p class="lead">{0}</p>' -f (ConvertTo-TRHtml $para.Trim()))) } }
+    $tokens = @{
+        '[[effH]]' = ('<span class="effsum" data-sum="all" data-fmt="N1">{0}</span>' -f (ConvertTo-TRHtml ('{0:N1}' -f $effort)))
+        '[[effD]]' = ('<span class="effsum" data-sum="all" data-fmt="D1">{0}</span>' -f (ConvertTo-TRHtml ('{0:N1}' -f $effortDays)))
+        '[[oppD]]' = ('<span class="effsum" data-sum="opps" data-fmt="N1">{0}</span>' -f (ConvertTo-TRHtml ('{0:N1}' -f $oppEffort)))
+    }
+    foreach ($para in ($lead -split '\|\| ')) {
+        if (-not $para.Trim()) { continue }
+        $h = ConvertTo-TRHtml $para.Trim()
+        foreach ($t in $tokens.Keys) { $h = $h.Replace($t, $tokens[$t]) }
+        [void]$sb.Append(('<p class="lead">{0}</p>' -f $h))
+    }
 
     [void]$sb.Append((New-TRPlanSummaryHtml $plan))
     [void]$sb.Append('<h3>Results by area</h3><div class="table-wrap static"><table><thead><tr><th>Area</th><th>RAG</th><th class="num">Fail</th><th class="num">Warning</th><th class="num">Pass</th><th class="num">Info or manual</th></tr></thead><tbody>')
@@ -750,7 +768,7 @@ function New-TRReportHtml {
             [void]$sb.Append(('<div class="f-head"><span class="chip s-{0}">{1}</span><span class="f-title">{2}</span><span class="sev">{3} severity</span><span class="f-id">{4}</span></div>' -f $f.Status, (Get-TRStatusLabel $f.Status), (ConvertTo-TRHtml $f.Title), $f.Severity, (ConvertTo-TRHtml $f.Id)))
             [void]$sb.Append(('<dl class="f-grid"><dt>Current state</dt><dd>{0}</dd>' -f (ConvertTo-TRHtml $f.Current)))
             if ($f.Status -ne 'Pass') { [void]$sb.Append(('<dt>Recommendation</dt><dd>{0}</dd>' -f (ConvertTo-TRHtml $f.Recommendation))) }
-            if ([double]$f.EffortHours -gt 0) { [void]$sb.Append(('<dt>Estimated effort</dt><dd>{0} {1}</dd>' -f $f.EffortHours, $(if ([double]$f.EffortHours -eq 1) { 'hour' } else { 'hours' }))) }
+            if ($f.Status -in @('Fail', 'Warning')) { [void]$sb.Append(('<dt>Estimated effort</dt><dd><span class="eff" data-ef="{0}" data-fmt="H">{1}</span></dd>' -f (ConvertTo-TRHtml $f.Id), (ConvertTo-TRHtml (Format-TRHoursText ([double]$f.EffortHours))))) }
             if ($f.Priority) { [void]$sb.Append(('<dt>Priority</dt><dd class="prio">{0}</dd>' -f $f.Priority)) }
             if ($f.Reference) { [void]$sb.Append(('<dt>Reference</dt><dd><a href="{0}" target="_blank" rel="noopener">{0}</a></dd>' -f (ConvertTo-TRHtml $f.Reference))) }
             if ((Test-TRHasProperty $f 'Frameworks') -and $f.Frameworks) { [void]$sb.Append(('<dt>Benchmarks</dt><dd>{0}</dd>' -f $(if ($bench.Count) { ConvertTo-TRRefLinks $f.Frameworks } else { ConvertTo-TRHtml $f.Frameworks }))) }
@@ -770,12 +788,12 @@ function New-TRReportHtml {
 
     $recs = @($all | Where-Object { $_.Status -in @('Fail', 'Warning', 'Manual') } | Sort-Object Priority, @{ e = { $sevOrder[[string]$_.Severity] } }, Id)
     [void]$sb.Append('<section id="tab-recommendations" class="tab"><h2>4. Prioritised recommendations</h2>')
-    [void]$sb.Append(('<p class="note">This is the technical list for engineers; the Action plan gives the same work in plain English. Priority P1 items (must do) are high-severity failures to fix first, P2 (should do) are medium-severity failures or high-severity warnings, and P3 (could do) are improvements and manual checks. Effort is an estimate of engineer hours for remediation and is for scoping only. Total: {0:N1} hours ({1:N1} days at {2} hours per day).</p>' -f $effort, $effortDays, $hoursPerDay))
+    [void]$sb.Append(('<p class="note">This is the technical list for engineers; the Action plan gives the same work in plain English. Priority P1 items (must do) are high-severity failures to fix first, P2 (should do) are medium-severity failures or high-severity warnings, and P3 (could do) are improvements and manual checks. Effort is an estimate of engineer hours for remediation and is for scoping only. Total: {0} hours ({1} days at {2} hours per day).</p>' -f $tokens['[[effH]]'], $tokens['[[effD]]'], $hoursPerDay))
     [void]$sb.Append('<div class="table-wrap static"><table><thead><tr><th>Priority</th><th>Recommendation</th><th>Area</th><th>Status</th><th class="num">Effort (hours)</th></tr></thead><tbody>')
     foreach ($f in $recs) {
-        [void]$sb.Append(('<tr><td class="prio">{0}</td><td><strong>{1}</strong> <span class="f-id">{2}</span><br>{3}</td><td>{4}</td><td><span class="chip s-{5}">{6}</span></td><td class="num">{7}</td></tr>' -f $f.Priority, (ConvertTo-TRHtml $f.Title), (ConvertTo-TRHtml $f.Id), (ConvertTo-TRHtml $f.Recommendation), (ConvertTo-TRHtml $f.Category), $f.Status, (Get-TRStatusLabel $f.Status), $(if ([double]$f.EffortHours -gt 0) { $f.EffortHours } else { '' })))
+        [void]$sb.Append(('<tr><td class="prio">{0}</td><td><strong>{1}</strong> <span class="f-id">{2}</span><br>{3}</td><td>{4}</td><td><span class="chip s-{5}">{6}</span></td><td class="num"><span class="eff" data-ef="{2}" data-fmt="N">{7}</span></td></tr>' -f $f.Priority, (ConvertTo-TRHtml $f.Title), (ConvertTo-TRHtml $f.Id), (ConvertTo-TRHtml $f.Recommendation), (ConvertTo-TRHtml $f.Category), $f.Status, (Get-TRStatusLabel $f.Status), $(if ([double]$f.EffortHours -gt 0) { Format-TRNumber ([double]$f.EffortHours) '0.##' } else { '' })))
     }
-    [void]$sb.Append(('<tr><td></td><td><strong>Total</strong></td><td></td><td></td><td class="num"><strong>{0:N1}</strong></td></tr></tbody></table></div></section>' -f $effort))
+    [void]$sb.Append(('<tr><td></td><td><strong>Total</strong></td><td></td><td></td><td class="num"><strong>{0}</strong></td></tr></tbody></table></div></section>' -f $tokens['[[effH]]']))
 
     if ($opps.Count) {
         [void]$sb.Append(('<section id="tab-opportunities" class="tab"><h2>{0}. Licence utilisation opportunities</h2>' -f $secOpp))
@@ -786,8 +804,8 @@ function New-TRReportHtml {
                 @{ V = $oppNotUsed.Count; L = 'Not used'; N = 'Licensed, not set up' },
                 @{ V = $oppPartial.Count; L = 'Partly used'; N = 'Licensed, partly set up' },
                 @{ V = $oppInUse.Count; L = 'In use'; N = 'Licensed and in use' },
-                @{ V = ('{0:N1}' -f $oppEffort); L = 'Days to adopt'; N = 'Estimated effort' })) {
-            [void]$sb.Append(('<div class="tile"><div class="v">{0}</div><div class="l">{1}</div><div class="n">{2}</div></div>' -f (ConvertTo-TRHtml $t.V), (ConvertTo-TRHtml $t.L), (ConvertTo-TRHtml $t.N)))
+                @{ V = ('{0:N1}' -f $oppEffort); Html = $tokens['[[oppD]]']; L = 'Days to adopt'; N = 'Estimated effort' })) {
+            [void]$sb.Append(('<div class="tile"><div class="v">{0}</div><div class="l">{1}</div><div class="n">{2}</div></div>' -f $(if ($t.Html) { $t.Html } else { ConvertTo-TRHtml $t.V }), (ConvertTo-TRHtml $t.L), (ConvertTo-TRHtml $t.N)))
         }
         if ($verify) { [void]$sb.Append(('<div class="tile"><div class="v">{0}</div><div class="l">Check in portal</div><div class="n">Usage not readable</div></div>' -f $verify)) }
         [void]$sb.Append('</div>')
@@ -817,7 +835,7 @@ function New-TRReportHtml {
                     $label = if ($o.Status -eq 'NotLicensed') { 'What it would add' } else { 'Opportunity' }
                     [void]$sb.Append(('<dt>{0}</dt><dd>{1}</dd><dt>Benefit</dt><dd>{2}</dd>' -f $label, (ConvertTo-TRHtml $o.Opportunity), (ConvertTo-TRHtml $o.Benefit)))
                 }
-                if ([double]$o.EffortDays -gt 0) { [void]$sb.Append(('<dt>Estimated effort</dt><dd>{0} {1}</dd>' -f $o.EffortDays, $(if ([double]$o.EffortDays -eq 1) { 'day' } else { 'days' }))) }
+                if ($o.Status -in @('NotUsed', 'Partial')) { [void]$sb.Append(('<dt>Estimated effort</dt><dd><span class="eff" data-eo="{0}" data-fmt="DR">{1}</span></dd>' -f (ConvertTo-TRHtml $o.Id), (ConvertTo-TRHtml (Format-TRDaysText ([double]$o.EffortDays))))) }
                 if ($o.Reference) { [void]$sb.Append(('<dt>Reference</dt><dd><a href="{0}" target="_blank" rel="noopener">{0}</a></dd>' -f (ConvertTo-TRHtml $o.Reference))) }
                 [void]$sb.Append('</dl></article>')
             }
@@ -852,9 +870,20 @@ function New-TRReportHtml {
         else { [void]$sb.Append('<p>Licence utilisation compares the service plans in each user''s assigned licences (excluding plans switched off on the licence) with configuration and 30-day usage reports. A feature shown as Not used is licensed but has no matching configuration or activity. Usage reports can lag by up to 48 hours.</p>') }
     }
     [void]$sb.Append(('<p>{0} of {1} collection steps succeeded. {2} failed and {3} were unavailable or skipped (often because a feature is not licensed). Checks that depend on missing data are shown as Not assessed. The Collection diagnostics inventory lists every step.</p>' -f @($diag | Where-Object { $_.Status -eq 'OK' }).Count, $diag.Count, $dFail.Count, $dUn.Count))
-    if ($dFail.Count) {
-        [void]$sb.Append('<div class="table-wrap static"><table><thead><tr><th>Item</th><th>Area</th><th>Error</th></tr></thead><tbody>')
-        foreach ($d in $dFail) { [void]$sb.Append(('<tr><td>{0}</td><td>{1}</td><td>{2}</td></tr>' -f (ConvertTo-TRHtml $d.Item), (ConvertTo-TRHtml $d.Area), (ConvertTo-TRHtml $d.Message))) }
+    $advice = @(Get-TRCollectionAdvice $diag)
+    if ($advice.Count) {
+        $actN = @($advice | Where-Object { $_.Action }).Count
+        [void]$sb.Append('<h3>What could not be read, and how to fix it</h3>')
+        $intro = if ($actN) { 'Rows marked Action needed can be fixed on the review account (a role, a licence or an approval). Make the change and run the review again to fill in the checks they affect. Rows marked No action reflect what the client has licensed or set up.' } else { 'Nothing here needs action: these rows reflect what the client has licensed or set up.' }
+        [void]$sb.Append(('<p>{0}</p>' -f (ConvertTo-TRHtml $intro)))
+        [void]$sb.Append('<div class="table-wrap static"><table><thead><tr><th></th><th>What</th><th>Why</th><th>Effect</th><th>What to do</th></tr></thead><tbody>')
+        foreach ($a in $advice) {
+            $eff = Format-TRAdviceEffect (Get-TRAdviceEffect -Advice $a -Findings $all -Benchmarks $bench)
+            $chip = if ($a.Action) { '<span class="chip adv-act">Action needed</span>' } else { '<span class="chip adv-ok">No action</span>' }
+            $why = $a.KindLabel
+            if ($a.Messages.Count) { $why += ': ' + (Get-TRShortText ([string]$a.Messages[0]) 180) }
+            [void]$sb.Append(('<tr><td>{0}</td><td><strong>{1}</strong><span class="adv-items">{2}</span></td><td>{3}</td><td>{4}</td><td>{5}</td></tr>' -f $chip, (ConvertTo-TRHtml $a.Group), (ConvertTo-TRHtml ($a.Items -join ', ')), (ConvertTo-TRHtml $why), (ConvertTo-TRHtml $eff), (ConvertTo-TRHtml $a.Fix)))
+        }
         [void]$sb.Append('</tbody></table></div>')
     }
     if ($gws) { [void]$sb.Append('<h3>Not covered by automated checks</h3><ul class="tight"><li>Gmail delegates, filters and forwarding set by individual users (the Gmail API needs per-user access that an admin sign-in does not give; the organisation-wide forwarding and delegation settings are checked)</li><li>Sharing of individual files in My Drive and shared drives, beyond the Drive audit log</li><li>Vault retention rules and holds (these need Vault access, which this review does not request)</li><li>Domain-wide delegation clients and context-aware access levels (not available through the Workspace APIs)</li><li>Backup of Google Workspace data</li></ul>') }
@@ -866,7 +895,10 @@ function New-TRReportHtml {
     [void]$sb.Append(('<footer>Prepared by {0} for {1}. Confidential. Generated {2} by {4} v{3}.</footer>' -f (ConvertTo-TRHtml $company), (ConvertTo-TRHtml $client), (Format-TRDate (Get-Date) -WithTime), (ConvertTo-TRHtml $script:TRToolVersion), $(if ($gws) { 'Tenant Review' } else { 'Tenant Review' })))
 
     $json = New-Object System.Text.StringBuilder
-    [void]$json.Append('{"meta":{"filePrefix":').Append((ConvertTo-TRJsonString $FilePrefix)).Append('},"findings":[')
+    [void]$json.Append('{"meta":{"filePrefix":').Append((ConvertTo-TRJsonString $FilePrefix))
+    [void]$json.Append(',"reportKey":').Append((ConvertTo-TRJsonString ('{0}|{1}|{2}' -f $FilePrefix, [string]$meta.StartedUtc, [string]$meta.TenantId)))
+    [void]$json.Append(',"fileOverrides":').Append((ConvertTo-TREffortMapJson $script:TREffortFileOverrides))
+    [void]$json.Append('},"plan":').Append((New-TRPlanModelJson $plan)).Append(',"findings":[')
     $first = $true
     foreach ($f in $all) {
         if (-not $first) { [void]$json.Append(',') }
@@ -922,7 +954,7 @@ function New-TRReportHtml {
         [void]$json.Append(']}')
     }
     [void]$json.Append(']}')
-    [void]$sb.Append('<script id="tr-data" type="application/json">').Append($json.ToString()).Append('</script><script>').Append((Get-TRReportJs)).Append('</script></body></html>')
+    [void]$sb.Append('<script id="tr-edits" type="application/json"></script><script id="tr-data" type="application/json">').Append($json.ToString()).Append('</script><script>').Append((Get-TRReportJs)).Append((Get-TREffortJs)).Append('</script></body></html>')
     $sb.ToString()
 }
 

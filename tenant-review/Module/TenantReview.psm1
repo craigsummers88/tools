@@ -4,7 +4,7 @@ if ($PSVersionTable.PSEdition -ne 'Core') {
 
 $script:TRRoot = Split-Path -Parent $PSScriptRoot
 
-foreach ($file in 'Api', 'Auth', 'GoogleApi', 'Collect', 'AzureCollect', 'GoogleCollect', 'Helpers', 'GoogleHelpers', 'Checks', 'IntuneChecks', 'AzureChecks', 'ServerChecks', 'GoogleChecks', 'Opportunities', 'GoogleOpportunities', 'Baselines', 'BaselinesCis', 'BaselinesScuba', 'GoogleBaselinesCis', 'GoogleBaselinesScuba', 'Inventory', 'GoogleInventory', 'ActionPlan', 'Report', 'Engine') {
+foreach ($file in 'Api', 'Auth', 'GoogleApi', 'Collect', 'AzureCollect', 'GoogleCollect', 'Helpers', 'GoogleHelpers', 'Checks', 'IntuneChecks', 'AzureChecks', 'ServerChecks', 'GoogleChecks', 'Opportunities', 'GoogleOpportunities', 'Baselines', 'BaselinesCis', 'BaselinesScuba', 'GoogleBaselinesCis', 'GoogleBaselinesScuba', 'Inventory', 'GoogleInventory', 'Effort', 'Advice', 'ActionPlan', 'Report', 'Engine') {
     . (Join-Path (Join-Path $PSScriptRoot 'Private') ($file + '.ps1'))
 }
 

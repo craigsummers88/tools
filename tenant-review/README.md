@@ -8,7 +8,7 @@
   <img src="https://img.shields.io/badge/Microsoft%20365-supported-0F4761?style=flat-square" alt="Microsoft 365">
   <img src="https://img.shields.io/badge/Google%20Workspace-supported-0F4761?style=flat-square" alt="Google Workspace">
   <img src="https://img.shields.io/badge/access-read--only-2E7D32?style=flat-square" alt="Read-only">
-  <img src="https://img.shields.io/badge/version-1.4.3-5F6B76?style=flat-square" alt="Version 1.4.3">
+  <img src="https://img.shields.io/badge/version-1.5.0-5F6B76?style=flat-square" alt="Version 1.5.0">
 </p>
 
 # Tenant Review
@@ -48,6 +48,8 @@ Each review produces:
 - a **full report PDF** ready to attach;
 - **CSV exports** of findings, the action plan, benchmarks and every inventory, ready for a proposal or your PSA;
 - **RawData.json**, so the report can be rebuilt later without signing in again.
+
+Before you share it, select **Edit effort** in the report to adjust any estimate. Every total, the timeline and the costs recalculate as you type, and the changes can be saved for the tool's PDFs and CSV files too. If the review account could not read something, the end of the log and the report's Method and limitations section say why and what to do, so you can fix the permission and run again.
 
 <p align="center">
   <img src="docs/images/report-action-plan.png" alt="The action plan tab" width="100%">
@@ -104,6 +106,10 @@ All screenshots use fictional organisations and `.example` domains.
   <tr>
     <td><img src="docs/images/google-summary.png" alt="Google Workspace summary"><br><sub><b>Google Workspace</b>: the same report for Google clients</sub></td>
     <td><img src="docs/images/pdf-pages.png" alt="Summary and action plan PDF"><br><sub><b>Summary PDF</b>: the pack you send to the client</sub></td>
+  </tr>
+  <tr>
+    <td><img src="docs/images/report-edit-effort.png" alt="Editing effort in the report"><br><sub><b>Edit effort</b>: change any estimate and everything recalculates</sub></td>
+    <td><img src="docs/images/report-what-to-fix.png" alt="What could not be read, and how to fix it"><br><sub><b>What to fix</b>: permission and licence gaps, with the fix</sub></td>
   </tr>
 </table>
 
