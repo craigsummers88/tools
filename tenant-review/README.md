@@ -8,7 +8,7 @@
   <img src="https://img.shields.io/badge/Microsoft%20365-supported-0F4761?style=flat-square" alt="Microsoft 365">
   <img src="https://img.shields.io/badge/Google%20Workspace-supported-0F4761?style=flat-square" alt="Google Workspace">
   <img src="https://img.shields.io/badge/access-read--only-2E7D32?style=flat-square" alt="Read-only">
-  <img src="https://img.shields.io/badge/version-1.4.2-5F6B76?style=flat-square" alt="Version 1.4.2">
+  <img src="https://img.shields.io/badge/version-1.4.3-5F6B76?style=flat-square" alt="Version 1.4.3">
 </p>
 
 # Tenant Review

@@ -281,6 +281,7 @@ Google Workspace files are named `<Client>-Google-Workspace-Review-<date>`. Thes
 | Usage reports show random names | The tenant conceals names in reports. Turn it off in the Microsoft 365 admin centre under **Org settings**, **Reports**, if the client agrees. |
 | Teams, SharePoint, Power BI or Power Platform controls show Not assessed | The service access was not approved, the account lacks the admin role, or the service is not set up. The log line for each service at the start of the run says which. |
 | AADSTS28004 "exceeded the number of scopes allowed" in the browser | Version 1.4.1 asked for every service in one approval request. Version 1.4.2 and later ask for each service separately. |
+| Power BI controls say the account has no Power BI or Fabric licence | The Power BI admin API only answers accounts that hold a Power BI licence. Assign the free Microsoft Fabric (Free) licence to the review account, or sign in once at app.powerbi.com with it, then run the review again. |
 | SharePoint settings show Not assessed with a 404 | The admin address worked out from the onmicrosoft.com domain is wrong, usually after a rename. Set `SharePointAdminUrl`. |
 | No PDF was created | Edge is not in the standard location. Set `PdfBrowserPath`, or open the HTML report and select **Save as PDF**. |
 | A single check shows Not assessed | The data it needs could not be read. The reason is in the finding and in Collection diagnostics. |

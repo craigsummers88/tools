@@ -1,4 +1,4 @@
-$script:TRToolVersion = '1.4.2'
+$script:TRToolVersion = '1.4.3'
 
 $script:TRRequiredGraphScopes = @(
     'User.Read', 'Directory.Read.All', 'Policy.Read.All', 'AuditLog.Read.All', 'Reports.Read.All', 'ReportSettings.Read.All',

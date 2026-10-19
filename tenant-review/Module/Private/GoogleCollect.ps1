@@ -307,7 +307,7 @@ function Invoke-TRGoogleCollection {
         [string]$ClientName,
         [int]$MaxUsers = 3000,
         [int]$MaxGroups = 1000,
-        [string]$ToolVersion = '1.4.2'
+        [string]$ToolVersion = '1.4.3'
     )
     $ctx = Get-TRContext
     if (-not $ctx -or $ctx.Platform -ne 'Google' -or -not $ctx.CustomerId) { throw 'Sign in to the client''s Google Workspace first.' }

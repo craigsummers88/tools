@@ -793,21 +793,37 @@ function Invoke-TRCollectIntuneDeep {
         try { $apps = Invoke-TRGraph -Path '/deviceAppManagement/mobileApps?$filter=isAssigned eq true&$expand=assignments' -All -MaxRetry 3 }
         catch { $apps = Invoke-TRGraph -Path '/deviceAppManagement/mobileApps?$expand=assignments' -All -MaxRetry 3 }
         $apps = @($apps | Where-Object { $null -ne $_ -and $_.isAssigned -ne $false })
-        $req = @($apps | Where-Object { @($_.assignments | Where-Object { [string]$_.intent -eq 'required' }).Count -gt 0 } | Select-Object -First 150)
-        $okCount = 0
-        $failCount = 0
-        foreach ($a in $req) {
+        $req = @($apps | Where-Object { @($_.assignments | Where-Object { [string]$_.intent -eq 'required' }).Count -gt 0 })
+        if (-not $req.Count) { return }
+        $cols = @('ApplicationId', 'DisplayName', 'Publisher', 'Platform', 'InstalledDeviceCount', 'FailedDeviceCount', 'PendingInstallDeviceCount', 'NotInstalledDeviceCount', 'FailedUserCount')
+        $byId = @{}
+        $useSelect = $true
+        $skip = 0
+        $page = 0
+        while ($page -lt 40) {
             Test-TRCancelled
-            try {
-                $s = Invoke-TRGraph -Path ('/deviceAppManagement/mobileApps/{0}/installSummary' -f $a.id) -Beta -MaxRetry 2
-                $okCount++
-                [pscustomobject]@{ AppId = [string]$a.id; App = [string]$a.displayName; Type = ([string]$a.'@odata.type' -replace '^#microsoft\.graph\.', ''); Publisher = [string]$a.publisher
-                    Installed = [int]$s.installedDeviceCount; Failed = [int]$s.failedDeviceCount; Pending = [int]$s.pendingInstallDeviceCount; NotInstalled = [int]$s.notInstalledDeviceCount; FailedUsers = [int]$s.failedUserCount }
-            }
+            $body = @{ skip = $skip; top = 50 }
+            if ($useSelect) { $body['select'] = $cols }
+            try { $resp = Invoke-TRGraph -Path '/deviceManagement/reports/getAppsInstallSummaryReport' -Method POST -Body $body -Beta -MaxRetry 3 }
             catch {
-                $failCount++
-                if ($okCount -eq 0 -and $failCount -ge 3) { throw }
+                if ($useSelect -and $skip -eq 0) { $useSelect = $false; continue }
+                throw
             }
+            $page++
+            $rows = ConvertFrom-TRIntuneReport $resp
+            foreach ($row in $rows) {
+                $id = [string](Get-TRReportValue $row @('^ApplicationId$', 'ApplicationId'))
+                if ($id) { $byId[$id.ToLower()] = $row }
+            }
+            if (@($rows).Count -lt 50) { break }
+            $skip += 50
+        }
+        foreach ($a in $req) {
+            $row = $byId[([string]$a.id).ToLower()]
+            if (-not $row) { continue }
+            [pscustomobject]@{ AppId = [string]$a.id; App = [string]$a.displayName; Type = ([string]$a.'@odata.type' -replace '^#microsoft\.graph\.', ''); Publisher = [string]$a.publisher
+                Installed = [int](Get-TRReportValue $row @('^InstalledDeviceCount$')); Failed = [int](Get-TRReportValue $row @('^FailedDeviceCount$')); Pending = [int](Get-TRReportValue $row @('^PendingInstallDeviceCount$'))
+                NotInstalled = [int](Get-TRReportValue $row @('^NotInstalledDeviceCount$')); FailedUsers = [int](Get-TRReportValue $row @('^FailedUserCount$')) }
         }
     } | Out-Null
     Invoke-TRStep 'Intune' 'IntuneCleanupRules' -List -Optional {
@@ -1017,8 +1033,16 @@ function Get-TRFabricSettings {
     }
     catch {
         if ($rows.Count) { throw }
-        $r = Invoke-TRServiceRest -Resource PowerBI -Uri ('{0}/v1/admin/tenantsettings' -f $ctx.PowerBIBase)
-        foreach ($s in @($r.tenantSettings) + @($r.value)) { if ($s) { [void]$rows.Add((ConvertTo-TRFabricSetting $s)) } }
+        try {
+            $r = Invoke-TRServiceRest -Resource PowerBI -Uri ('{0}/v1/admin/tenantsettings' -f $ctx.PowerBIBase)
+            foreach ($s in @($r.tenantSettings) + @($r.value)) { if ($s) { [void]$rows.Add((ConvertTo-TRFabricSetting $s)) } }
+        }
+        catch {
+            if ([int]$_.Exception.Data['HttpStatus'] -eq 401 -and $_.Exception.Message -match 'not licensed') {
+                throw 'The signed-in account has no Power BI or Fabric licence, which the Power BI admin API needs. Assign it the free Microsoft Fabric (Free) licence, or sign in once at app.powerbi.com with it, then run the review again.'
+            }
+            throw
+        }
     }
     , $rows.ToArray()
 }
@@ -1231,7 +1255,7 @@ function Invoke-TenantCollection {
         [string[]]$Areas = $script:TRDefaultAreas,
         [string]$ClientName,
         [int]$MaxMailboxes = 3000,
-        [string]$ToolVersion = '1.4.2'
+        [string]$ToolVersion = '1.4.3'
     )
     $ctx = Get-TRContext
     if (-not $ctx -or -not $ctx.TenantId) { throw 'Sign in to the client tenant first.' }
