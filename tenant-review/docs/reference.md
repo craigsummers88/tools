@@ -84,7 +84,8 @@ Licensing of the benchmark content:
 Some benchmark controls need settings that Microsoft Graph does not expose: Teams policies, SharePoint tenant settings, Power BI tenant settings and Power Platform settings. When **Teams, SharePoint, Power BI and Power Platform settings** is ticked, the review asks for read access to those services once at the start of the run.
 
 - If the account has already approved them for this client, nothing is shown.
-- Otherwise the browser opens once, with the account filled in. Approve it and the review carries on. If you close the page or decline, the review continues without them and the related controls show Not assessed.
+- Otherwise the browser opens once for each service not yet approved, with the account filled in. Microsoft only allows one service per approval request, so the first review of a client can show up to five approval pages (four services plus Azure). Tick **Consent on behalf of your organisation** on each one and later reviews ask nothing.
+- If you decline one, the review moves on to the next. If you leave a page without approving it, the review waits up to four minutes, then continues without the remaining services and their controls show Not assessed.
 - A service that is not set up in the client tenant, for example a tenant that has never used Power BI, is skipped.
 
 These permissions are requested during the review, so they are not part of the app registration. They are removed with the app if you use **Remove the review app from this tenant**.
@@ -279,6 +280,7 @@ Google Workspace files are named `<Client>-Google-Workspace-Review-<date>`. Thes
 | An opportunity shows Not assessed | The usage data could not be read, or its review area was not selected. The reason is in the card. |
 | Usage reports show random names | The tenant conceals names in reports. Turn it off in the Microsoft 365 admin centre under **Org settings**, **Reports**, if the client agrees. |
 | Teams, SharePoint, Power BI or Power Platform controls show Not assessed | The service access was not approved, the account lacks the admin role, or the service is not set up. The log line for each service at the start of the run says which. |
+| AADSTS28004 "exceeded the number of scopes allowed" in the browser | Version 1.4.1 asked for every service in one approval request. Version 1.4.2 and later ask for each service separately. |
 | SharePoint settings show Not assessed with a 404 | The admin address worked out from the onmicrosoft.com domain is wrong, usually after a rename. Set `SharePointAdminUrl`. |
 | No PDF was created | Edge is not in the standard location. Set `PdfBrowserPath`, or open the HTML report and select **Save as PDF**. |
 | A single check shows Not assessed | The data it needs could not be read. The reason is in the finding and in Collection diagnostics. |

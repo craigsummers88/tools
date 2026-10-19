@@ -184,7 +184,7 @@ Identity, access, privileged roles and licensing are always included. Tick the o
 
 1. In step 4 **Output**, check the **Reports folder**. The default is `Documents\Tenant Reviews`.
 2. Select **Run review**.
-3. If you ticked the service settings or Azure, the browser opens once to approve read access the first time you review that client with that account. Approve it and the review carries on. **Copy sign-in link** is shown while it waits, in case the wrong browser profile opened.
+3. If you ticked the service settings or Azure, the first time you review that client with that account the browser opens once for each service (up to five pages) to approve read access. Tick **Consent on behalf of your organisation** on each one so later reviews ask nothing. **Copy sign-in link** is shown while it waits, in case the wrong browser profile opened.
 
 A typical small business tenant takes 2 to 5 minutes. The progress bar and live log show each step as it runs.
 

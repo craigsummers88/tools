@@ -312,34 +312,29 @@ function Request-TRServiceAccess {
         try { Get-TRAccessToken -Resource $k | Out-Null; $result[$k] = 'Ready'; $wanted.Remove($k) }
         catch { }
     }
-    $attempt = 0
-    while ($wanted.Count -and $attempt -lt 2) {
-        $attempt++
-        $scopes = @(@($wanted | ForEach-Object { Get-TRResourceScope $_ }) + 'offline_access')
-        $first = [string]$wanted[0]
-        $names = (@($wanted | ForEach-Object { $script:TRServices[$_].Name }) -join ', ')
+    $total = $wanted.Count
+    $index = 0
+    $abandoned = $false
+    foreach ($k in @($wanted)) {
+        $index++
+        $name = $script:TRServices[$k].Name
+        if ($abandoned) {
+            $result[$k] = 'Skipped: the previous approval in the browser was not completed.'
+            continue
+        }
+        $scope = (Get-TRResourceScope $k) + ' offline_access'
+        $step = if ($total -gt 1) { (' ({0} of {1})' -f $index, $total) } else { '' }
         try {
-            $tok = Invoke-TRAuthCode -Tenant $ctx.TenantId -ClientId $ctx.ClientId -Scope ($scopes -join ' ') -TokenScope ((Get-TRResourceScope $first) + ' offline_access') -LoginHint $ctx.Account -Prompt '' -TimeoutSeconds $TimeoutSeconds -OnAuthUrl $OnAuthUrl -NoBrowser:$NoBrowser -Message ('Approve read access to {0} in the browser. The review continues without them if you skip this.' -f $names)
-            Set-TRToken -Resource $first -TokenResponse $tok
-            foreach ($k in @($wanted)) {
-                try { Get-TRAccessToken -Resource $k | Out-Null; $result[$k] = 'Ready' }
-                catch { $result[$k] = 'Failed: ' + $_.Exception.Message }
-            }
-            $wanted.Clear()
+            $tok = Invoke-TRAuthCode -Tenant $ctx.TenantId -ClientId $ctx.ClientId -Scope $scope -TokenScope $scope -LoginHint $ctx.Account -Prompt '' -TimeoutSeconds $TimeoutSeconds -OnAuthUrl $OnAuthUrl -NoBrowser:$NoBrowser -Message ('Approve read access to {0} in the browser{1}. The review continues without it if you skip this.' -f $name, $step)
+            Set-TRToken -Resource $k -TokenResponse $tok
+            $result[$k] = 'Ready'
         }
         catch {
             if ($_.Exception.Message -eq 'Operation cancelled by user.') { throw }
             $msg = $_.Exception.Message
             $raw = [string]$_.Exception.Data['RawError']
-            $text = $msg + ' ' + $raw
-            $bad = @($wanted | Where-Object { $svcKey = $_; @($script:TRServices[$svcKey].Markers | Where-Object { $text -match [regex]::Escape($_) }).Count -gt 0 })
-            $stop = ($attempt -ge 2) -or (-not $bad.Count) -or ($bad.Count -eq $wanted.Count) -or ($text -match 'Timed out|access_denied|cancel')
-            $failed = if ($stop) { @($wanted) } else { $bad }
-            foreach ($k in $failed) {
-                $result[$k] = 'Failed: ' + $(if ($raw) { ($raw -split "`r?`n")[0] } else { $msg })
-                [void]$wanted.Remove($k)
-            }
-            if ($stop) { $wanted.Clear() }
+            $result[$k] = 'Failed: ' + $(if ($raw) { ($raw -split "`r?`n")[0] } else { $msg })
+            if (($msg + ' ' + $raw) -match 'Timed out') { $abandoned = $true }
         }
     }
     $ctx.ServiceAccess = $result

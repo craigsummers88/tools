@@ -1231,7 +1231,7 @@ function Invoke-TenantCollection {
         [string[]]$Areas = $script:TRDefaultAreas,
         [string]$ClientName,
         [int]$MaxMailboxes = 3000,
-        [string]$ToolVersion = '1.4.1'
+        [string]$ToolVersion = '1.4.2'
     )
     $ctx = Get-TRContext
     if (-not $ctx -or -not $ctx.TenantId) { throw 'Sign in to the client tenant first.' }
